@@ -1,0 +1,24 @@
+.task{
+    margin-top: 80px;
+    margin-left: 4%;
+    margin-right: 4%;
+    min-height: 50vh;
+}
+
+.cardComponent{
+    margin-top: 8px;
+    margin-bottom: 8px;
+    width: 11rem;
+}
+
+.newTask{
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.lisTask{
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btnG{
+    width: 59px;
+}

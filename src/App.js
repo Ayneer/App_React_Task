@@ -1,26 +1,43 @@
 import React from 'react';
-import logo from './logo.svg';
+
+//import css
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+//init Data
+//import Data from './data/Data';
+
+
+//Components
+import Navbar from './components/dom/navbar/Navbar.componet';
+import AppRoutes from './routes/routes';
+
+//imports to routes
+import { BrowserRouter as Routes } from 'react-router-dom';
+
+class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      tasks: []
+    }
+  }
+  render() {
+
+    return (
+
+      <div className="App">
+        {/* To use routes, it's to <Routes/> */}
+        <Routes>
+          <Navbar />
+          <AppRoutes />
+        </Routes>
+      </div>
+
+    );
+  }
 }
+
 
 export default App;

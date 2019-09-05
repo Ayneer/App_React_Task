@@ -1,8 +1,24 @@
-.navbar{
-    
- background-color:rgb(0,0,0);
- opacity:0.3; /* Opacidad 60% */
-
-
+.navbar {
+    background-color: rgb(0, 0, 0);
     font-weight: bold;
+    -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
+}
+
+.dropdown-menu {
+    background-color: black;
+    transition: all 1s;
+}
+
+.dropdown-item{
+    color: white;
+}
+
+.dropdown-item:hover{
+    color: black;
+}
+
+.dropdown-divider{
+    border-color: white;
 }

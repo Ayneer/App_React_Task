@@ -8,8 +8,6 @@ import TaskModel from '../../../model/task/Task';
 
 class Task extends React.Component {
 
-    posts = [];
-
     //We are using a model (TaskModel), we define their props
     //title, descriptios, user and status
     constructor(props) {
@@ -19,7 +17,8 @@ class Task extends React.Component {
         this.state = {
             title: "",
             description: "",
-            userMail: "",
+            user: "",
+            status: "",
             filter: "",
             lisTask: [],
             ok: false,
@@ -58,20 +57,23 @@ class Task extends React.Component {
 
     cardChanged2(event) {
 
-        this.cardChanged(event);
+        //this.cardChanged(event);
 
         const value = event.target.value;
 
         var filter = this.usersMails.filter(function (str) {
             return str.includes(value);
         });
-
         console.log(filter);
+        this.setState({
+            user: value
+        });
     }
 
     async saveCard() {
-        const { title, description, userMail } = this.state;
-        if (!title || !description || !userMail) {
+        const { title, description, user} = this.state;
+        console.log(title, description, user);
+        if (!title || !description || !user) {
             console.log("Error, debe llenar los campos!");
             this.setState({
                 newMessage: true,
@@ -80,20 +82,20 @@ class Task extends React.Component {
         } else {
             const response = await fetch('http://localhost:3500/task', {
                 method: 'POST',
-                body: JSON.stringify({ title, description, userMail }),
+                body: JSON.stringify({ title, description, user, status:"OPEN" }),
                 headers: {
                     'Content-Type': 'application/json; charset=UTF-8',
                     'Accept': 'application/json'
                 }
             });
             const json = await response.json();
-            if(json.state){
+            if (json.state) {
                 this.setState({
                     newMessage: true,
                     message: "The task has been saved"
                 });
                 this.componentDidMount();
-            }else{
+            } else {
                 this.setState({
                     newMessage: true,
                     message: "The task has not been saved"
@@ -123,18 +125,23 @@ class Task extends React.Component {
     ]
 
     render() {
-        const { ok, lisTask, newMessage, message } = this.state;
+        const { ok, lisTask, newMessage, message, user } = this.state;
         if (!ok) {
             return (
                 <div> Loading list of task...</div>
             )
         } else {
             return (
-                <div className="task">
+                <div className="task container">
 
                     <div className="row rowOne">
+                        
                         <div className="col-lg-3 newTask">
-
+                            <div className="titleNewTask">
+                                <h6>
+                                    Open New Task
+                                </h6>
+                            </div>
                             {/* New Task. start */}
                             <div className="card mx-auto cardComponent">
                                 {newMessage ? <div>{message}</div> : null}
@@ -147,12 +154,12 @@ class Task extends React.Component {
                                 <ul className="list-group list-group-flush">
                                     {/* Task Description */}
                                     <li className="list-group-item">
-                                        <textarea className="form-control" type="text" name="description" placeholder="Description..." value={this.state.description}
+                                        <textarea className="form-control textAreaNewTask" type="text" name="description" placeholder="Description..." value={this.state.description}
                                             onChange={this.cardChanged}></textarea>
                                     </li>
 
                                     <li className="list-group-item">
-                                        <div className=" btn-group-sm mx-auto">
+                                        <div className="btn-group-sm btn-newTask">
                                             {/* Task button Save */}
                                             <button type="submit" className="btn btn-primary mr-3 btnG" onClick={this.saveCard}>
                                                 Save
@@ -182,7 +189,7 @@ class Task extends React.Component {
                                 {
                                     lisTask.map((task, id) =>
                                         <div className="col" key={id}>
-                                            <TaskModel id={id} title={task.title} description={task.description} editCard={this.editCard} />
+                                            <TaskModel id={id} title={task.title} description={task.description} editCard={this.editCard} status={task.status} user={user}/>
                                         </div>
                                     )
 
@@ -191,6 +198,7 @@ class Task extends React.Component {
 
                             </div>
                         </div>
+
                     </div>
 
                     <div className="row ">

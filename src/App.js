@@ -31,6 +31,9 @@ class App extends React.Component {
         {/* To use routes, it's to <Routes/> */}
         <Routes>
           <Navbar />
+          <div className="container title">
+            <h1>To-do!</h1>
+          </div>
           <AppRoutes />
         </Routes>
       </div>

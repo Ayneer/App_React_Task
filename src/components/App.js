@@ -3,13 +3,9 @@ import React from 'react';
 //import css
 import './App.css';
 
-//init Data
-//import Data from './data/Data';
-
-
 //Components
-import Navbar from './components/dom/navbar/Navbar.componet';
-import AppRoutes from './routes/routes';
+import Navbar from './dom/navbar/Navbar.componet';
+import AppRoutes from '../routes/Routes';
 
 //imports to routes
 import { BrowserRouter as Routes } from 'react-router-dom';

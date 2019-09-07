@@ -6,7 +6,7 @@ import { Route, Switch } from 'react-router-dom';
 //Component's list to be routes.
 import Task from '../components/view/task/Task.component';
 import User from '../components/view/user/User.component';
-import Index from '../components/index/Index.component';
+import Index from '../components/view/index/Index.component';
 
 function ErrorPage(){
     return(

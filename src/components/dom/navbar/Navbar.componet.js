@@ -1,4 +1,6 @@
 import React from 'react';
+
+//import css
 import './Navbar.component.css';
 
 //import Link to use routes

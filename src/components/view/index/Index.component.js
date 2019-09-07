@@ -4,10 +4,10 @@ import React from 'react';
 import './Index.component.css';
 
 //import images
-import imgNodejs from '../../image/nodejs.png';
-import imgMongodb from '../../image/mongodb.png';
-import imgBootstrap from '../../image/bootstrap.png';
-import imgReactjs from '../../image/reactjs.png';
+import imgNodejs from '../../../image/nodejs.png';
+import imgMongodb from '../../../image/mongodb.png';
+import imgBootstrap from '../../../image/bootstrap.png';
+import imgReactjs from '../../../image/reactjs.png';
 
 class Index extends React.Component{
     

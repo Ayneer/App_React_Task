@@ -25,7 +25,8 @@ class Task extends React.Component {
             ok: false,
             newMessage: false,
             message: "",
-            show: false
+            show: false,//show edit button
+            disableUser: true
         };
 
         this.cardChanged = this.cardChanged.bind(this);
@@ -34,6 +35,7 @@ class Task extends React.Component {
         this.clearCard = this.clearCard.bind(this);
         this.editCard = this.editCard.bind(this);
         this.upDateCard = this.upDateCard.bind(this);
+        this.checkbox = this.checkbox.bind(this);
 
     }
 
@@ -92,7 +94,13 @@ class Task extends React.Component {
     }
 
     async saveCard() {
-        const { title, description, user } = this.state;
+        let user = "";
+        if(this.state.disableUser){
+            user = "Not assigned";
+        }else{
+            user = this.state.user;
+        }
+        const { title, description } = this.state;
         console.log(title, description, user);
         if (!title || !description || !user) {
             console.log("Error, debe llenar los campos!");
@@ -116,6 +124,7 @@ class Task extends React.Component {
                     message: "The task has been saved"
                 });
                 this.componentDidMount();
+                this.clearCard();
             } else {
                 this.setState({
                     newMessage: true,
@@ -133,8 +142,7 @@ class Task extends React.Component {
             description: "",
             user: "",
             _id: 0,
-            show: false,
-            newMessage: false
+            show: false
         });
     }
 
@@ -165,16 +173,23 @@ class Task extends React.Component {
 
     }
 
-    async upDateCard(){
+    async upDateCard() {
+
+        let user = "";
+        if(this.state.disableUser){
+            user = "Not assigned";
+        }else{
+            user = this.state.user;
+        }
 
         const update = {
             title: this.state.title,
             description: this.state.description,
-            user: this.state.user,
+            user: user,
             status: this.state.status
         }
 
-        const response = await fetch('http://localhost:3500/task/'+this.state._id, {
+        const response = await fetch('http://localhost:3500/task/' + this.state._id, {
             method: 'PUT',
             body: JSON.stringify(update),
             headers: {
@@ -184,7 +199,7 @@ class Task extends React.Component {
         });
 
         const json = await response.json();
-        if(json.state){
+        if (json.state) {
             this.setState({
                 newMessage: true,
                 message: "The task has been updated",
@@ -192,10 +207,23 @@ class Task extends React.Component {
             });
             this.clearCard();
             this.componentDidMount();
-        }else{
+        } else {
             this.setState({
                 newMessage: true,
                 message: "The task has not been updated"
+            });
+        }
+    }
+
+    checkbox(event){
+        const state = event.target.checked;
+        if(state){
+            this.setState({
+                disableUser: false
+            });
+        }else{
+            this.setState({
+                disableUser: true
             });
         }
     }
@@ -206,7 +234,7 @@ class Task extends React.Component {
 
     render() {
         console.log("soy render");
-        const { ok, lisTask, newMessage, message, show } = this.state;
+        const { ok, lisTask, newMessage, message, show, disableUser } = this.state;
         let empty = false;
         if (!ok) {
             return (
@@ -250,11 +278,11 @@ class Task extends React.Component {
                                                 ?
                                                 //Button Edit
                                                 <div className="btn-group-md">
-                                                    
+
                                                     < button type="submit" className="btn btn-primary mr-3 btn-EdiTask" onClick={this.upDateCard}>
                                                         Save changes
                                                     </button>
- 
+
                                                     <button type="submit" className="btn btn-danger btn-EdiTask" onClick={this.clearCard}>
                                                         Cancel
                                                     </button>
@@ -263,11 +291,11 @@ class Task extends React.Component {
                                                 :
                                                 //Button Save
                                                 <div className="btn-group-sm btn-newTask">
-                                                    
+
                                                     < button type="submit" className="btn btn-primary mr-3 btnG" onClick={this.saveCard}>
                                                         Save
                                                     </button>
- 
+
                                                     <button type="submit" className="btn btn-danger btnG" onClick={this.clearCard}>
                                                         Clear
                                                     </button>
@@ -279,7 +307,11 @@ class Task extends React.Component {
 
                                     {/* Task user */}
                                     <li className="list-group-item">
-                                        <input className="form-control" placeholder="@user's mail" name="user" value={this.state.user} onChange={this.cardChanged2}
+                                        <div className="chekbox">
+                                            <input className="form-check-input" type="checkbox" id="assignUser" onChange={this.checkbox}  />
+                                            <label className="form-check-label" htmlFor="assignUser">Assing a User.</label>
+                                        </div>
+                                        <input className="form-control" placeholder="@user's mail" name="user" value={this.state.user} onChange={this.cardChanged2} disabled={disableUser}
                                         />
                                     </li>
 

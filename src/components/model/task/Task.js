@@ -62,6 +62,13 @@ class TaskModel extends React.Component {
                             <li className="list-group-item">
                                 <small className="text-muted">{this.props.user}</small>
                             </li>
+
+                            {/* Change status */}
+                            <li className="list-group-item">
+                                <button type="button" value={this.props._id} className="btn btn-secondary btn-start" onClick={this.props.startTask}>
+                                    Start task
+                                </button>
+                            </li>
                         </ul>
                     </div>
                     {/* New Task. end */}

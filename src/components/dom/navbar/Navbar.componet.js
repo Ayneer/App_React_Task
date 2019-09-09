@@ -35,7 +35,7 @@ class Navbar extends React.Component {
 
                                     <div className="dropdown-divider"/>
 
-                                    <Link className="dropdown-item" to="/tasks/In-Progress">In Progress</Link>
+                                    <Link className="dropdown-item" to="tasks_InProgress">In Progress</Link>
 
                                     <div className="dropdown-divider"/>
                                     

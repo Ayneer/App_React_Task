@@ -1,4 +1,5 @@
 import React from 'react';
+//import socketIOClient from "socket.io-client";
 
 //import css
 import './App.css';
@@ -10,6 +11,9 @@ import AppRoutes from '../routes/Routes';
 //imports to routes
 import { BrowserRouter as Routes } from 'react-router-dom';
 
+//const socket = socketIOClient('http://localhost:3500');//Me suscribo al socket del servidor
+//socket.on('connect', function () { });
+
 class App extends React.Component {
 
   constructor(props) {
@@ -20,7 +24,8 @@ class App extends React.Component {
     }
   }
   render() {
-
+    
+    //socket.emit('send', "helow from App");
     return (
 
       <div className="App">
@@ -30,7 +35,7 @@ class App extends React.Component {
           <div className="container title">
             <h1>To-do!</h1>
           </div>
-          <AppRoutes />
+          <AppRoutes /*socket={socket}*/ />
         </Routes>
       </div>
 

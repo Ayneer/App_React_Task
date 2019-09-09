@@ -6,7 +6,7 @@ import './Task.component.css';
 //import a task model, to no repeat the same code
 import TaskModel from '../../model/task/Task';
 
-class Task extends React.Component {
+class TaskInProgress extends React.Component {
 
     //We are using a model (TaskModel), we define their props
     //title, descriptios, user and status
@@ -62,7 +62,7 @@ class Task extends React.Component {
         let lisTaskOpen = [];
         if (json.state) {
             for (var i = 0; i < json.lisTask.length; i++) {
-                if (json.lisTask[i].status === "OPEN") {
+                if (json.lisTask[i].status === "INPROGRESS") {
                     lisTaskOpen.push(json.lisTask[i]);
                 }
             }
@@ -228,7 +228,7 @@ class Task extends React.Component {
         }
     }
 
-    async startTask(event){
+    async startTask(event) {
         const idCard = event.target.value;
         const ediTask = this.findTask(idCard);
         console.log(this.findTask(idCard));
@@ -259,9 +259,9 @@ class Task extends React.Component {
     ]
 
     render() {
-        console.log("soy render");
+        console.log("soy render task in progress");
         //this.props.socket.emit('send', "helow2 from task");
-        const { ok, lisTask, newMessage, message, show, disableUser } = this.state;
+        const { ok, lisTask, newMessage, message, disableUser } = this.state;
         let empty = false;
         if (!ok) {
             return (
@@ -279,7 +279,7 @@ class Task extends React.Component {
                         <div className="col-lg-3 newTask">
                             <div className="titleNewTask">
                                 <h6>
-                                    Open New Task
+                                    Edit Task In Progress
                                 </h6>
                             </div>
                             {/* New Task. start */}
@@ -300,35 +300,17 @@ class Task extends React.Component {
 
                                     <li className="list-group-item">
 
-                                        {
-                                            show
-                                                ?
-                                                //Button Edit
-                                                <div className="btn-group-md">
+                                        <div className="btn-group-md">
 
-                                                    < button type="submit" className="btn btn-primary mr-3 btn-EdiTask" onClick={this.upDateCard}>
-                                                        Save changes
-                                                    </button>
+                                            < button type="submit" className="btn btn-primary mr-3 btn-EdiTask" onClick={this.upDateCard}>
+                                                Save changes
+                                            </button>
 
-                                                    <button type="submit" className="btn btn-danger btn-EdiTask" onClick={this.clearCard}>
-                                                        Cancel
-                                                    </button>
+                                            <button type="submit" className="btn btn-danger btn-EdiTask" onClick={this.clearCard}>
+                                                Cancel
+                                            </button>
 
-                                                </div>
-                                                :
-                                                //Button Save
-                                                <div className="btn-group-sm btn-newTask">
-
-                                                    < button type="submit" className="btn btn-primary mr-3 btnG" onClick={this.saveCard}>
-                                                        Save
-                                                    </button>
-
-                                                    <button type="submit" className="btn btn-danger btnG" onClick={this.clearCard}>
-                                                        Clear
-                                                    </button>
-
-                                                </div>
-                                        }
+                                        </div>
 
                                     </li>
 
@@ -354,11 +336,11 @@ class Task extends React.Component {
                                     ?
                                     lisTask.map((task, id) =>
                                         <div className="col-lg-3" key={id}>
-                                            <TaskModel _id={task._id} title={task.title} description={task.description} editCard={this.editCard} status={task.status} user={task.user} use={"lisTask"} startTask={this.startTask}/>
+                                            <TaskModel _id={task._id} title={task.title} description={task.description} editCard={this.editCard} status={task.status} user={task.user} use={"lisTask"} startTask={this.startTask} />
                                         </div>
                                     )
                                     :
-                                    <div>There are not Open tasks</div>
+                                    <div>There are not In progress tasks</div>
                                 }
                                 {/* Cards examples end */}
 
@@ -373,4 +355,4 @@ class Task extends React.Component {
     }
 }
 
-export default Task;
+export default TaskInProgress;

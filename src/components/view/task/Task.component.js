@@ -37,16 +37,9 @@ class Task extends React.Component {
         this.startTask = this.startTask.bind(this);
         this.upDateCard = this.upDateCard.bind(this);
         this.checkbox = this.checkbox.bind(this);
+        this.filterTask = this.filterTask.bind(this);
 
     }
-
-    setShow(estate) {
-        this.setState({
-            show: estate
-        })
-    }
-    handleClose = () => this.setShow(false);
-    handleShow = () => this.setShow(true);
 
     async componentDidMount() {
         console.log("soy componentDidMount");
@@ -71,6 +64,21 @@ class Task extends React.Component {
         } else {
             this.setState({ lisTask: json.lisTask, ok: true });
         }
+    }
+
+    filterTask(event) {
+        const value = event.target.value;
+        const listTaskTitle = [];
+        for (var i = 0; i < this.state.lisTask.length; i++) {
+            listTaskTitle.push(this.state.lisTask[i].title);
+        }
+        var filter = listTaskTitle.filter(function (str) {
+            return str.includes(value);
+        });
+        console.log(filter);
+        // this.setState({
+        //     user: value
+        // });
     }
 
     cardChanged(event) {
@@ -228,7 +236,7 @@ class Task extends React.Component {
         }
     }
 
-    async startTask(event){
+    async startTask(event) {
         const idCard = event.target.value;
         const ediTask = this.findTask(idCard);
         console.log(this.findTask(idCard));
@@ -347,14 +355,17 @@ class Task extends React.Component {
 
                         </div>
                         <div className="col-lg-9 lisTask">
-                            <div className="row rowTwo">
 
+                            <div className="row rowTwo">
+                                <div className="col-lg-12 search-task">
+                                    <input className="form-control" type="text" placeholder="Search a Task" aria-label="Search" onChange={this.filterTask} />
+                                </div>
                                 {/* Cards examples start. Here we use the model and send the props*/}
                                 {empty
                                     ?
                                     lisTask.map((task, id) =>
                                         <div className="col-lg-3" key={id}>
-                                            <TaskModel _id={task._id} title={task.title} description={task.description} editCard={this.editCard} status={task.status} user={task.user} use={"lisTask"} startTask={this.startTask}/>
+                                            <TaskModel _id={task._id} title={task.title} description={task.description} editCard={this.editCard} status={task.status} user={task.user} startTask={this.startTask} />
                                         </div>
                                     )
                                     :

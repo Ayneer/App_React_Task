@@ -12,3 +12,17 @@
 .btn-start{
     width: 100%;
 }
+
+.btn-success{
+    width: 100%;
+    margin-bottom: 1em;
+}
+
+.btn-warning{
+    width: 100%;
+    margin-bottom: 1em;
+}
+
+.btn-danger{
+    width: 100%;
+}

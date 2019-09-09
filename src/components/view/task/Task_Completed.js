@@ -6,7 +6,7 @@ import './Task.component.css';
 //import a task model, to no repeat the same code
 import TaskModel from '../../model/task/Task';
 
-class TaskInProgress extends React.Component {
+class TaskCompleted extends React.Component {
 
     //We are using a model (TaskModel), we define their props
     //title, descriptios, user and status
@@ -19,7 +19,7 @@ class TaskInProgress extends React.Component {
             ok: false
         };
 
-        this.taskCompleted = this.taskCompleted.bind(this);
+        this.archiveTask = this.archiveTask.bind(this);
         this.cancelTask = this.cancelTask.bind(this);
 
     }
@@ -35,15 +35,15 @@ class TaskInProgress extends React.Component {
         });
         const json = await response.json();
 
-        let lisTaskINPROGRESS = [];
+        let lisTaskCOMPLETED = [];
         if (json.state) {
             for (var i = 0; i < json.lisTask.length; i++) {
-                if (json.lisTask[i].status === "INPROGRESS") {
-                    lisTaskINPROGRESS.push(json.lisTask[i]);
+                if (json.lisTask[i].status === "COMPLETED") {
+                    lisTaskCOMPLETED.push(json.lisTask[i]);
                 }
             }
-            this.setState({ lisTask: lisTaskINPROGRESS, ok: true });
-            console.log(lisTaskINPROGRESS);
+            this.setState({ lisTask: lisTaskCOMPLETED, ok: true });
+            console.log(lisTaskCOMPLETED);
         } else {
             this.setState({ lisTask: json.lisTask, ok: true });
         }
@@ -59,7 +59,7 @@ class TaskInProgress extends React.Component {
         return task;
     }
 
-    async taskCompleted(event) {
+    async archiveTask(event) {
         const idCard = event.target.value;
         const ediTask = this.findTask(idCard);
         console.log(this.findTask(idCard));
@@ -67,7 +67,7 @@ class TaskInProgress extends React.Component {
             title: ediTask.title,
             description: ediTask.description,
             user: ediTask.user,
-            status: "COMPLETED"
+            status: "ARCHIVED"
         }
         const response = await fetch('http://localhost:3500/task/' + ediTask._id, {
             method: 'PUT',
@@ -93,7 +93,7 @@ class TaskInProgress extends React.Component {
             title: ediTask.title,
             description: ediTask.description,
             user: ediTask.user,
-            status: "OPEN"
+            status: "INPROGRESS"
         }
         const response = await fetch('http://localhost:3500/task/' + ediTask._id, {
             method: 'PUT',
@@ -142,7 +142,7 @@ class TaskInProgress extends React.Component {
                                     
                                     lisTask.map((task, id) =>
                                         <div className="col-lg-3" key={id}>
-                                            <TaskModel _id={task._id} title={task.title} description={task.description} taskCompleted={this.taskCompleted} status={task.status} user={task.user} cancelTask={this.cancelTask} />
+                                            <TaskModel _id={task._id} title={task.title} description={task.description} archiveTask={this.archiveTask} status={task.status} user={task.user} cancelTask={this.cancelTask} />
                                         </div>
                                     )                                    
                                 }
@@ -159,4 +159,4 @@ class TaskInProgress extends React.Component {
     }
 }
 
-export default TaskInProgress;
+export default TaskCompleted;

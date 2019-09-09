@@ -39,11 +39,11 @@ class Navbar extends React.Component {
 
                                     <div className="dropdown-divider"/>
                                     
-                                    <Link className="dropdown-item" to="/tasks/Completed">Completed</Link>
+                                    <Link className="dropdown-item" to="/tasks_Completed">Completed</Link>
                                     
                                     <div className="dropdown-divider"/>
 
-                                    <Link className="dropdown-item" to="/tasks/Archived">Archived</Link>
+                                    <Link className="dropdown-item" to="/tasks_Archived">Archived</Link>
                                     
                                 </div>
                             </li>

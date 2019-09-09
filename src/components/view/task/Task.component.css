@@ -51,14 +51,14 @@
     padding-bottom: 10px;
 }
 
+.search-task{
+    padding-top: 1em;
+}
+
 .lisTask{
     background: rgba(255, 255, 255, 0.2);
 }
 
 .btnG{
     width: 59px;
-}
-
-.modal-open{
-    padding-right: 19px;
 }

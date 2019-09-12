@@ -6,6 +6,8 @@ import './Task.component.css';
 //import a task model, to no repeat the same code
 import TaskModel from '../../model/task/Task';
 
+let listTaskFilter = [];
+
 class Task extends React.Component {
 
     //We are using a model (TaskModel), we define their props
@@ -17,7 +19,7 @@ class Task extends React.Component {
         this.state = {
             title: "",
             description: "",
-            user: "",
+            user: "Not assigned",
             status: "",
             _id: 0,
             filter: "",
@@ -26,7 +28,8 @@ class Task extends React.Component {
             newMessage: false,
             message: "",
             show: false,//show edit button
-            disableUser: true
+            disableUser: true,
+            showRemoveUser: false
         };
 
         this.cardChanged = this.cardChanged.bind(this);
@@ -38,6 +41,7 @@ class Task extends React.Component {
         this.upDateCard = this.upDateCard.bind(this);
         this.checkbox = this.checkbox.bind(this);
         this.filterTask = this.filterTask.bind(this);
+        this.removeUser = this.removeUser.bind(this);
 
     }
 
@@ -53,10 +57,12 @@ class Task extends React.Component {
         const json = await response.json();
 
         let lisTaskOpen = [];
+        listTaskFilter = [];
         if (json.state) {
             for (var i = 0; i < json.lisTask.length; i++) {
                 if (json.lisTask[i].status === "OPEN") {
                     lisTaskOpen.push(json.lisTask[i]);
+                    listTaskFilter.push(json.lisTask[i]);
                 }
             }
             this.setState({ lisTask: lisTaskOpen, ok: true });
@@ -68,19 +74,17 @@ class Task extends React.Component {
 
     filterTask(event) {
         const value = event.target.value;
-        const listTaskTitle = [];
-        for (var i = 0; i < this.state.lisTask.length; i++) {
-            listTaskTitle.push(this.state.lisTask[i].title);
-        }
-        var filter = listTaskTitle.filter(function (str) {
-            return str.includes(value);
+
+        var filter = listTaskFilter.filter((str) => {
+            return str.title.toLowerCase().includes(value.toLowerCase()) || str.description.toLowerCase().includes(value.toLowerCase()) || str.user.toLowerCase().includes(value.toLowerCase());
         });
-        console.log(filter);
-        // this.setState({
-        //     user: value
-        // });
+
+        this.setState({
+            lisTask: filter
+        });
     }
 
+    //method to catch the new card' inputs
     cardChanged(event) {
         const name = event.target.name;
         const value = event.target.value;
@@ -103,14 +107,9 @@ class Task extends React.Component {
     }
 
     async saveCard() {
-        let user = "";
-        if (this.state.disableUser) {
-            user = "Not assigned";
-        } else {
-            user = this.state.user;
-        }
-        const { title, description } = this.state;
-        console.log(title, description, user);
+
+        const { title, description, user } = this.state;
+
         if (!title || !description || !user) {
             console.log("Error, debe llenar los campos!");
             this.setState({
@@ -146,12 +145,27 @@ class Task extends React.Component {
     }
 
     clearCard() {
+        if (!this.state.showRemoveUser) {
+            document.getElementById("assignUser").checked = false;
+        }
         this.setState({
             title: "",
             description: "",
-            user: "",
+            user: "Not assigned",
             _id: 0,
-            show: false
+            show: false,
+            disableUser: true,
+            showRemoveUser: false
+        });
+    }
+
+    removeUser(){
+        document.getElementById("btnRemove").setAttribute("disabled","disabled");
+        var inputUser = document.getElementById("inputUser");
+        inputUser.value = "Not assigned";
+        document.getElementById("inputUser").setAttribute("disabled","disabled");
+        this.setState({
+            user: "Not assigned"
         });
     }
 
@@ -168,32 +182,32 @@ class Task extends React.Component {
     editCard(event) {
 
         const idCard = event.target.value;
-
         const ediTask = this.findTask(idCard);
+        let showRemoveUser = false;
+        let disableUser = true;
+        if (ediTask.user !== "Not assigned") {
+            showRemoveUser = true;
+            disableUser = false;
+        }
         this.setState({
             title: ediTask.title,
             description: ediTask.description,
             user: ediTask.user,
             status: ediTask.status,
             _id: ediTask._id,
-            show: true
+            show: true,
+            showRemoveUser: showRemoveUser,
+            disableUser: disableUser
         });
 
     }
 
     async upDateCard() {
 
-        let user = "";
-        if (this.state.disableUser) {
-            user = "Not assigned";
-        } else {
-            user = this.state.user;
-        }
-
         const update = {
             title: this.state.title,
             description: this.state.description,
-            user: user,
+            user: this.state.user,
             status: this.state.status
         }
 
@@ -224,14 +238,16 @@ class Task extends React.Component {
     }
 
     checkbox(event) {
-        const state = event.target.checked;
-        if (state) {
+        const state2 = event.target.checked;
+        if (state2) {
             this.setState({
-                disableUser: false
+                disableUser: false,
+                user: ""
             });
         } else {
             this.setState({
-                disableUser: true
+                disableUser: true,
+                user: "Not assigned"
             });
         }
     }
@@ -269,7 +285,7 @@ class Task extends React.Component {
     render() {
         console.log("soy render");
         //this.props.socket.emit('send', "helow2 from task");
-        const { ok, lisTask, newMessage, message, show, disableUser } = this.state;
+        const { ok, lisTask, newMessage, message, show, disableUser, showRemoveUser } = this.state;
         let empty = false;
         if (!ok) {
             return (
@@ -342,11 +358,16 @@ class Task extends React.Component {
 
                                     {/* Task user */}
                                     <li className="list-group-item">
-                                        <div className="chekbox">
-                                            <input className="form-check-input" type="checkbox" id="assignUser" onChange={this.checkbox} />
-                                            <label className="form-check-label" htmlFor="assignUser">Assing a User.</label>
-                                        </div>
-                                        <input className="form-control" placeholder="@user's mail" name="user" value={this.state.user} onChange={this.cardChanged2} disabled={disableUser}
+                                        {showRemoveUser ?
+                                            <button type="submit" id="btnRemove" className="btn btn-danger btn-EdiTask" onClick={this.removeUser}>
+                                                Remove this user
+                                            </button> :
+                                            <div className="chekbox">
+                                                <input className="form-check-input" type="checkbox" id="assignUser" onChange={this.checkbox} />
+                                                <label className="form-check-label" htmlFor="assignUser">Assing a User.</label>
+                                            </div>
+                                        }
+                                        <input className="form-control" placeholder="@user's mail" name="user" id="inputUser" value={this.state.user} onChange={this.cardChanged2} disabled={disableUser}
                                         />
                                     </li>
                                 </ul>

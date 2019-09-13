@@ -59,7 +59,7 @@ class TaskModel extends React.Component {
                                         :
                                         null
                                     }
-                                    <button type="submit" className={btn} disabled>
+                                    <button type="submit" id={btn} className={btn} disabled>
                                         {this.props.status}
                                     </button>
                                 </div>
@@ -91,7 +91,7 @@ class TaskModel extends React.Component {
                                             Completed
                                         </button>
 
-                                        <button type="button" value={this.props._id} className="btn btn-danger" onClick={this.props.cancelTask}>
+                                        <button type="button" id="btn-danger" value={this.props._id} className="btn btn-danger" onClick={this.props.cancelTask}>
                                             Cancel
                                         </button>
 
@@ -108,7 +108,7 @@ class TaskModel extends React.Component {
                                             Archive
                                         </button>
 
-                                        <button type="button" value={this.props._id} className="btn btn-danger" onClick={this.props.cancelTask}>
+                                        <button type="button"  id="btn-danger" value={this.props._id} className="btn btn-danger" onClick={this.props.cancelTask}>
                                             Cancel
                                         </button>
 
@@ -121,7 +121,7 @@ class TaskModel extends React.Component {
                                     ?
                                     <div>
 
-                                        <button type="button" value={this.props._id} className="btn btn-danger" onClick={this.props.cancelTask}>
+                                        <button type="button"  id="btn-danger" value={this.props._id} className="btn btn-danger" onClick={this.props.cancelTask}>
                                             Cancel
                                         </button>
 

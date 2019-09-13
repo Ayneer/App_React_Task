@@ -7,7 +7,7 @@ import './Task.component.css';
 import TaskModel from '../../model/task/Task';
 
 let listTaskFilter = [];
-
+let usersMails = [];
 class Task extends React.Component {
 
     //We are using a model (TaskModel), we define their props
@@ -29,7 +29,8 @@ class Task extends React.Component {
             message: "",
             show: false,//show edit button
             disableUser: true,
-            showRemoveUser: false
+            showRemoveUser: false,
+            showNewEmail: false
         };
 
         this.cardChanged = this.cardChanged.bind(this);
@@ -48,7 +49,6 @@ class Task extends React.Component {
     async componentDidMount() {
         console.log("soy componentDidMount");
         const response = await fetch('http://localhost:3500/task', {
-            method: 'GET',
             headers: {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Accept': 'application/json'
@@ -58,15 +58,29 @@ class Task extends React.Component {
 
         let lisTaskOpen = [];
         listTaskFilter = [];
+        usersMails = [];
+
         if (json.state) {
             for (var i = 0; i < json.lisTask.length; i++) {
                 if (json.lisTask[i].status === "OPEN") {
                     lisTaskOpen.push(json.lisTask[i]);
                     listTaskFilter.push(json.lisTask[i]);
                 }
+                let cont = 0;
+                if(json.lisTask[i].user){
+                    for (let index = 0; index < usersMails.length; index++) {
+                        const element = usersMails[index];
+                        if(element === json.lisTask[i].user || json.lisTask[i].user === "Not assigned"){
+                            cont++;   
+                        }
+                    }    
+                    if(cont === 0){
+                        usersMails.push(json.lisTask[i].user);
+                    }                
+                }                
             }
             this.setState({ lisTask: lisTaskOpen, ok: true });
-            console.log(lisTaskOpen);
+            console.log(usersMails);
         } else {
             this.setState({ lisTask: json.lisTask, ok: true });
         }
@@ -93,17 +107,28 @@ class Task extends React.Component {
         });
     }
 
+    validateEmail(email) {
+        var re = /^(([^<>()[\]\\.,;:\s@]+(\.[^<>()[\]\\.,;:\s@]+)*)|(.+))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    }
+
     cardChanged2(event) {
 
         const value = event.target.value;
-
-        var filter = this.usersMails.filter(function (str) {
+        let status = false;
+        var filter = usersMails.filter(function (str) {
             return str.includes(value);
         });
-        console.log(filter);
+        if(this.validateEmail(value)){
+            if(filter[0] !== value){
+                status = true;
+            }
+        }
         this.setState({
-            user: value
+            user: value,
+            showNewEmail: status
         });
+
     }
 
     async saveCard() {
@@ -139,7 +164,6 @@ class Task extends React.Component {
                     message: "The task has not been saved"
                 });
             }
-            //this.setState({ lisTask: [json], ok: true });
         }
 
     }
@@ -159,11 +183,11 @@ class Task extends React.Component {
         });
     }
 
-    removeUser(){
-        document.getElementById("btnRemove").setAttribute("disabled","disabled");
+    removeUser() {
+        document.getElementById("btnRemove").setAttribute("disabled", "disabled");
         var inputUser = document.getElementById("inputUser");
         inputUser.value = "Not assigned";
-        document.getElementById("inputUser").setAttribute("disabled","disabled");
+        document.getElementById("inputUser").setAttribute("disabled", "disabled");
         this.setState({
             user: "Not assigned"
         });
@@ -278,14 +302,8 @@ class Task extends React.Component {
         }
     }
 
-    usersMails = [
-        "ex1@ex.com", "as123@hotmail.com", "hola99@gmail.com"
-    ]
-
     render() {
-        console.log("soy render");
-        //this.props.socket.emit('send', "helow2 from task");
-        const { ok, lisTask, newMessage, message, show, disableUser, showRemoveUser } = this.state;
+        const { ok, lisTask, newMessage, message, show, disableUser, showRemoveUser, showNewEmail } = this.state;
         let empty = false;
         if (!ok) {
             return (
@@ -303,7 +321,7 @@ class Task extends React.Component {
                         <div className="col-lg-3 newTask">
                             <div className="titleNewTask">
                                 <h6>
-                                    Open New Task
+                                    New open Task
                                 </h6>
                             </div>
                             {/* New Task. start */}
@@ -363,6 +381,15 @@ class Task extends React.Component {
                                                 Remove this user
                                             </button> :
                                             <div className="chekbox">
+                                                {showNewEmail ? 
+                                                    <div>
+                                                        <h6>
+                                                            This email don't exist. It will be add
+                                                        </h6>
+                                                    </div>
+                                                    : 
+                                                    null
+                                                }
                                                 <input className="form-check-input" type="checkbox" id="assignUser" onChange={this.checkbox} />
                                                 <label className="form-check-label" htmlFor="assignUser">Assing a User.</label>
                                             </div>

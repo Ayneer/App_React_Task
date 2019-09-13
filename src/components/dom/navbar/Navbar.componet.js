@@ -12,7 +12,7 @@ class Navbar extends React.Component {
             <div className="NavbarP">
 
                 <nav className="navbar navbar-expand-lg navbar-light bg-light container ">
-                    <Link to="/" className="navbar-brand">Brand</Link>
+                    <Link to="/" className="navbar-brand">To-do App</Link>
 
                     {/* button to responsive navbar */}
                     <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,7 +31,7 @@ class Navbar extends React.Component {
                                 </Link>
                                 <div className="dropdown-menu" aria-labelledby="navbarDropdown">
                                     
-                                    <Link className="dropdown-item" to="/tasks">New/Watch Task</Link>
+                                    <Link className="dropdown-item" to="/tasks">New open Task</Link>
 
                                     <div className="dropdown-divider"/>
 

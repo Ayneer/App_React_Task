@@ -4,12 +4,12 @@ import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 //Component's list to be routes.
-import Task from '../components/view/task/Task.component';
+import Task from '../components/view/task/Task';
 import TaskInProgress from '../components/view/task/Task_in_progress';
 import TaskCompleted from '../components/view/task/Task_Completed';
 import TaskArchived from '../components/view/task/Task_Archived';
 import User from '../components/view/user/User';
-import Index from '../components/view/index/Index.component';
+import Index from '../components/view/index/Index';
 
 function ErrorPage(){
     return(

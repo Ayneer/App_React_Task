@@ -16,6 +16,7 @@ class User extends React.Component {
             listUser: [],
             newMessage: false,
             newMessageListUser: false,
+            classNewMessage: "",
             message: "",
             btnEditUser: false
         }
@@ -23,6 +24,7 @@ class User extends React.Component {
         this.formUser = this.formUser.bind(this);
         this.newUser = this.newUser.bind(this);
         this.clearCard = this.clearCard.bind(this);
+        this.closeNewMessage = this.closeNewMessage.bind(this);
         this.editUser = this.editUser.bind(this);
         this.updateUSer = this.updateUSer.bind(this);
         this.deleteUser = this.deleteUser.bind(this);
@@ -31,7 +33,6 @@ class User extends React.Component {
 
     async componentDidMount() {
         const response = await fetch('http://localhost:3500/user', {
-            method: 'GET',
             headers: {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Accept': 'application/json'
@@ -74,13 +75,27 @@ class User extends React.Component {
         return re.test(email);
     }
 
+    throwMessage(message, classNewMessage){
+        this.setState({
+            classNewMessage: classNewMessage,
+            newMessage: true,
+            message: message
+        });
+    }
+
+    closeNewMessage(){
+        this.setState({
+            classNewMessage: "",
+            newMessage: false,
+            newMessageListUser: false,
+            message: ""
+        });
+    }
+
     async newUser() {
         const { email, name } = this.state;
         if (email === "" || name === "") {
-            this.setState({
-                newMessage: true,
-                message: "You have to write all input"
-            });
+            this.throwMessage("You have to write all input", "alert alert-danger");
         } else {
             if (this.validateEmail(email)) {
                 const response = await fetch('http://localhost:3500/user', {
@@ -93,23 +108,14 @@ class User extends React.Component {
                 });
                 const json = await response.json();
                 if (json.state) {
-                    this.setState({
-                        newMessage: true,
-                        message: json.message
-                    });
+                    this.throwMessage(json.message, "alert alert-success");
                     this.componentDidMount();
                     this.clearCard();
                 } else {
-                    this.setState({
-                        newMessage: true,
-                        message: json.message
-                    });
+                    this.throwMessage(json.message, "alert alert-danger");
                 }
             } else {
-                this.setState({
-                    newMessage: true,
-                    message: "write a valid email."
-                });
+                this.throwMessage("write a valid email.", "alert alert-danger");
             }
 
         }
@@ -128,12 +134,14 @@ class User extends React.Component {
         if (json.state) {
             this.setState({
                 newMessageListUser: true,
+                classNewMessage: "alert alert-success",
                 message: json.message
             });
             this.componentDidMount();
         } else {
             this.setState({
                 newMessageListUser: true,
+                classNewMessage: "alert alert-danger",
                 message: json.message
             });
         }
@@ -166,10 +174,7 @@ class User extends React.Component {
     async updateUSer() {
         const { email, name, id } = this.state;
         if (email === "" || name === "") {
-            this.setState({
-                newMessage: true,
-                message: "You have to write all input"
-            });
+            this.throwMessage("You have to write all input", "alert alert-danger");
         } else {
             if (this.validateEmail(email)) {
                 const response = await fetch('http://localhost:3500/user/' + id, {
@@ -182,25 +187,15 @@ class User extends React.Component {
                 });
                 const json = await response.json();
                 if (json.state) {
-                    this.setState({
-                        newMessage: true,
-                        message: json.message
-                    });
+                    this.throwMessage(json.message, "alert alert-success");
                     this.componentDidMount();
                     this.clearCard();
                 } else {
-                    this.setState({
-                        newMessage: true,
-                        message: json.message
-                    });
+                    this.throwMessage(json.message, "alert alert-danger");
                 }
             } else {
-                this.setState({
-                    newMessage: true,
-                    message: "write a email valid."
-                });
+                this.throwMessage("write a email valid.", "alert alert-danger");
             }
-
         }
     }
 
@@ -209,13 +204,12 @@ class User extends React.Component {
             name: "",
             email: "",
             id: "",
-            btnEditUser: false,
-            newMessage: false
+            btnEditUser: false
         });
     }
 
     render() {
-        const { email, name, showUser, listUser, newMessage, message, btnEditUser, newMessageListUser } = this.state;
+        const { email, name, showUser, listUser, newMessage, message, btnEditUser, newMessageListUser, classNewMessage } = this.state;
         let ThereUser = false;
         if (showUser) {
             if (listUser.length > 0) {
@@ -228,12 +222,18 @@ class User extends React.Component {
                             <div className="titleNewUser">
                                 <h6>
                                     New user
-                                    </h6>
+                                </h6>
                             </div>
                             {/* New user card start */}
                             <div className="card mx-auto cardComponent">
-                                {newMessage ? <div>{message}</div> : null}
-
+                                {newMessage ?
+                                    <div className={classNewMessage} id="alert" role="alert">
+                                        {message}
+                                        <button type="button" className="close" onClick={this.closeNewMessage}>
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div> 
+                                : null}
                                 <div className="card-header">
 
                                     <input className="form-control inputUser" type="text" name="name" placeholder="User's name" value={name} onChange={this.formUser}></input>
@@ -262,7 +262,14 @@ class User extends React.Component {
                         </div>
                         <div className="col-lg-8 listUser">
 
-                            {newMessageListUser ? <div>{message}</div> : null}
+                            {newMessageListUser ? 
+                                <div className={classNewMessage} role="alert">
+                                    {message}
+                                    <button type="button" className="close" onClick={this.closeNewMessage}>
+                                            <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div> 
+                                     : null}
 
                             <div className="filterUser">
                                 <input className="form-control" type="text" placeholder="Search a user by name or email" aria-label="Search" onChange={this.filterUser} />

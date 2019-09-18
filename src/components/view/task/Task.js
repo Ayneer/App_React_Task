@@ -1,7 +1,7 @@
 import React from 'react';
 
 //import css
-import './Task.component.css';
+import './task.css';
 
 //import a task model, to no repeat the same code
 import TaskModel from '../../model/task/Task';
@@ -28,6 +28,7 @@ class Task extends React.Component {
             ok: false,
             newMessage: false,
             message: "",
+            classNewMessage: "alert alert-primary",
             show: false,//show edit button
             disableUser: true,
             showRemoveUser: false,
@@ -44,11 +45,18 @@ class Task extends React.Component {
         this.checkbox = this.checkbox.bind(this);
         this.filterTask = this.filterTask.bind(this);
         this.removeUser = this.removeUser.bind(this);
+        this.closeNewMessage = this.closeNewMessage.bind(this);
 
     }
 
+    closeNewMessage() {
+        this.setState({
+            newMessage: false,
+            message: ""
+        })
+    }
+
     async componentDidMount() {
-        console.log("soy componentDidMount");
         const response = await fetch('http://localhost:3500/task', {
             headers: {
                 'Content-Type': 'application/json; charset=UTF-8',
@@ -81,7 +89,6 @@ class Task extends React.Component {
                 }
             }
             this.setState({ lisTask: lisTaskOpen, ok: true });
-            console.log(usersMails);
         } else {
             this.setState({ lisTask: json.lisTask, ok: true });
         }
@@ -127,7 +134,7 @@ class Task extends React.Component {
 
         listUser.innerHTML = "";
 
-        for(var i = 0; i<filter.length; i++){
+        for (var i = 0; i < filter.length; i++) {
             var option = document.createElement('option');
             option.value = filter[i];
             listUser.appendChild(option);
@@ -145,19 +152,19 @@ class Task extends React.Component {
 
     }
 
-    throwMessage(message) {
+    throwMessage(message, classNewMessage) {
         this.setState({
             newMessage: true,
-            message: message
+            message: message,
+            classNewMessage: classNewMessage
         });
     }
 
     async saveCard() {
 
         const { title, description, user, name, showNewEmail } = this.state;
-        console.log(title, description, user, name);
         if (!title || !description || !user || (showNewEmail && !name)) {
-            this.throwMessage("You must write all the labels.");
+            this.throwMessage("You must write all the labels.", "alert alert-danger");
         } else {
             let valEmail = false;
             if (user === "Not assigned") {
@@ -187,22 +194,22 @@ class Task extends React.Component {
                         });
                         const json_2 = await response_2.json();
                         if (json_2.state) {
-                            this.throwMessage("The task and user have been saved");
+                            this.throwMessage("The task and user have been saved", "alert alert-success");
                             this.componentDidMount();
                             this.clearCard();
                         } else {
-                            this.throwMessage("Error: The task has been saved but the user has not.");
+                            this.throwMessage("Error: The task has been saved but the user has not.", "alert alert-danger");
                         }
                     } else {
-                        this.throwMessage(json.message);
+                        this.throwMessage(json.message, "alert alert-success");
                         this.componentDidMount();
                         this.clearCard();
                     }
                 } else {
-                    this.throwMessage(json.message);
+                    this.throwMessage(json.message, "alert alert-danger");
                 }
             } else {
-                this.throwMessage("Write a valid email, example@domain.com");
+                this.throwMessage("Write a valid email, example@domain.com", "alert alert-danger");
             }
         }
     }
@@ -230,7 +237,10 @@ class Task extends React.Component {
         inputUser.value = "Not assigned";
         document.getElementById("inputUser").setAttribute("disabled", "disabled");
         this.setState({
-            user: "Not assigned"
+            user: "Not assigned",
+            newMessage: true,
+            message: "The user will be deleted.",
+            classNewMessage: "alert alert-warning"
         });
     }
 
@@ -290,7 +300,7 @@ class Task extends React.Component {
 
             if (showNewEmail) {
                 if (!name) {
-                    this.throwMessage("You have write a user's name.");
+                    this.throwMessage("You have write a user's name.", "alert alert-danger");
                 } else {
                     const response_2 = await fetch('http://localhost:3500/user', {
                         method: 'POST',
@@ -315,16 +325,17 @@ class Task extends React.Component {
                             this.setState({
                                 newMessage: true,
                                 message: "Task updated and user add successfuly!",
+                                classNewMessage: "alert alert-success",
                                 show: false//hide the update button
                             });
                             this.clearCard();
                             this.componentDidMount();
                         } else {
-                            this.throwMessage("Error: User add successfuly! But the task could not update!");
+                            this.throwMessage("Error: User add successfuly! But the task could not update!", "alert alert-danger");
                             this.componentDidMount();
                         }
                     } else {
-                        this.throwMessage("Error: The user could not be add and the task could not update!");
+                        this.throwMessage("Error: The user could not be add and the task could not update!", "alert alert-danger");
                     }
                 }
             } else {
@@ -341,16 +352,17 @@ class Task extends React.Component {
                     this.setState({
                         newMessage: true,
                         message: "The task has been updated",
+                        classNewMessage: "alert alert-success",
                         show: false//hide the update button
                     });
                     this.clearCard();
                     this.componentDidMount();
                 } else {
-                    this.throwMessage("The task has not been updated");
+                    this.throwMessage("The task has not been updated", "alert alert-danger");
                 }
             }
         } else {
-            this.throwMessage("Write a valid email, example@domain.com");
+            this.throwMessage("Write a valid email, example@domain.com", "alert alert-danger");
         }
     }
 
@@ -372,7 +384,6 @@ class Task extends React.Component {
     async startTask(event) {
         const idCard = event.target.value;
         const ediTask = this.findTask(idCard);
-        console.log(this.findTask(idCard));
         const update = {
             title: ediTask.title,
             description: ediTask.description,
@@ -391,12 +402,12 @@ class Task extends React.Component {
         if (json.state) {
             this.componentDidMount();
         } else {
-            //alert
+            this.throwMessage("Error to start the task!", "alert alert-danger");
         }
     }
 
     render() {
-        const { ok, lisTask, newMessage, message, show, disableUser, showRemoveUser, showNewEmail, name } = this.state;
+        const { ok, lisTask, newMessage, message, show, disableUser, showRemoveUser, showNewEmail, name, classNewMessage } = this.state;
         let empty = false;
         if (!ok) {
             return (
@@ -419,7 +430,16 @@ class Task extends React.Component {
                             </div>
                             {/* New Task. start */}
                             <div className="card mx-auto cardComponent">
-                                {newMessage ? <div>{message}</div> : null}
+
+                                {newMessage ?
+                                    <div className={classNewMessage} role="alert">
+                                        {message}
+                                        <button type="button" className="close" onClick={this.closeNewMessage}>
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div> 
+                                    : null}
+
                                 {/* Task Title */}
                                 <div className="card-header">
                                     <input className="form-control" type="text" name="title" placeholder="Task's title" value={this.state.title} onChange={this.cardChanged}></input>
@@ -469,26 +489,37 @@ class Task extends React.Component {
 
                                     {/* Task user */}
                                     <li className="list-group-item">
+
                                         {showNewEmail ?
-                                            <div>
-                                                <h6>
-                                                    This email don't exist. It will be add
-                                                        </h6>
+                                            <div className="alert alert-warning" role="alert">
+                                                <strong>
+                                                    <h6>
+                                                        This email don't exist. It will be add
+                                                    </h6>
+                                                </strong>
                                             </div>
                                             :
                                             null
                                         }
+
                                         {showRemoveUser ?
-                                            <button type="submit" id="btnRemove" className="btn btn-danger btn-EdiTask" onClick={this.removeUser}>
+
+                                            <button type="submit" id="btnRemove" className="btn btn-danger btnUser" onClick={this.removeUser}>
                                                 Remove this user
                                             </button> :
+
                                             <div className="chekbox">
+
                                                 <input className="form-check-input" type="checkbox" id="assignUser" onChange={this.checkbox} />
+
                                                 <label className="form-check-label" htmlFor="assignUser">Assing a User.</label>
+
                                             </div>
                                         }
-                                        <input className="form-control" list="listUser" placeholder="user@mail.com" name="user" id="inputUser" value={this.state.user} onChange={this.cardChanged2} disabled={disableUser}
+
+                                        <input className="form-control imputUser" list="listUser" placeholder="user@mail.com" name="user" id="inputUser" value={this.state.user} onChange={this.cardChanged2} disabled={disableUser}
                                         />
+
                                         <datalist id="listUser">
                                             <option></option>
                                         </datalist>
@@ -497,6 +528,7 @@ class Task extends React.Component {
                                             <input className="form-control" type="text" name="name" placeholder="User's name" value={name} onChange={this.cardChanged}></input>
                                             : null
                                         }
+
                                     </li>
                                 </ul>
                             </div>

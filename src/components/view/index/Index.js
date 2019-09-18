@@ -1,7 +1,7 @@
 import React from 'react';
 
 //import css
-import './Index.component.css';
+import './index.css';
 
 //import images
 import imgNodejs from '../../../image/nodejs.png';

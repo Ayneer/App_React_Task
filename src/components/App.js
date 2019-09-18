@@ -1,18 +1,15 @@
 import React from 'react';
-//import socketIOClient from "socket.io-client";
 
 //import css
 import './App.css';
 
 //Components
-import Navbar from './dom/navbar/Navbar.componet';
+import Navbar from './dom/navbar/Navbar';
 import AppRoutes from '../routes/Routes';
 
 //imports to routes
 import { BrowserRouter as Routes } from 'react-router-dom';
 
-//const socket = socketIOClient('http://localhost:3500');//Me suscribo al socket del servidor
-//socket.on('connect', function () { });
 
 class App extends React.Component {
 

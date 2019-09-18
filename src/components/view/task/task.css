@@ -20,7 +20,6 @@
     margin: 0;
 }
 
-
 .cardComponent{
     margin-top: 8px;
     margin-bottom: 8px;
@@ -29,6 +28,11 @@
 
 .newTask{
     background: rgba(255, 255, 255, 0.3);
+}
+
+.alert{
+    margin-left: 15px;
+    margin-right: 15px;
 }
 
 .titleNewTask{
@@ -60,4 +64,13 @@
 
 .btnG{
     width: 59px;
+}
+
+.btnUser{
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.imputUser{
+    margin-bottom: 10px;
 }

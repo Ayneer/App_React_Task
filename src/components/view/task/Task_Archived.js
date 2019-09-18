@@ -1,7 +1,7 @@
 import React from 'react';
 
 //import css
-import './Task.component.css';
+import './task.css';
 
 //import a task model, to no repeat the same code
 import TaskModel from '../../model/task/Task';

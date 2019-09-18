@@ -20,6 +20,7 @@ class Task extends React.Component {
             title: "",
             description: "",
             user: "Not assigned",
+            name: "",
             status: "",
             _id: 0,
             filter: "",
@@ -67,17 +68,17 @@ class Task extends React.Component {
                     listTaskFilter.push(json.lisTask[i]);
                 }
                 let cont = 0;
-                if(json.lisTask[i].user){
+                if (json.lisTask[i].user) {
                     for (let index = 0; index < usersMails.length; index++) {
                         const element = usersMails[index];
-                        if(element === json.lisTask[i].user || json.lisTask[i].user === "Not assigned"){
-                            cont++;   
+                        if (element === json.lisTask[i].user || json.lisTask[i].user === "Not assigned") {
+                            cont++;
                         }
-                    }    
-                    if(cont === 0){
+                    }
+                    if (cont === 0) {
                         usersMails.push(json.lisTask[i].user);
-                    }                
-                }                
+                    }
+                }
             }
             this.setState({ lisTask: lisTaskOpen, ok: true });
             console.log(usersMails);
@@ -115,12 +116,25 @@ class Task extends React.Component {
     cardChanged2(event) {
 
         const value = event.target.value;
+
         let status = false;
+
+        var listUser = document.getElementById('listUser');
+
         var filter = usersMails.filter(function (str) {
             return str.includes(value);
         });
-        if(this.validateEmail(value)){
-            if(filter[0] !== value){
+
+        listUser.innerHTML = "";
+
+        for(var i = 0; i<filter.length; i++){
+            var option = document.createElement('option');
+            option.value = filter[i];
+            listUser.appendChild(option);
+        }
+
+        if (this.validateEmail(value)) {
+            if (filter[0] !== value) {
                 status = true;
             }
         }
@@ -131,41 +145,66 @@ class Task extends React.Component {
 
     }
 
+    throwMessage(message) {
+        this.setState({
+            newMessage: true,
+            message: message
+        });
+    }
+
     async saveCard() {
 
-        const { title, description, user } = this.state;
-
-        if (!title || !description || !user) {
-            console.log("Error, debe llenar los campos!");
-            this.setState({
-                newMessage: true,
-                message: "You must write all the labels."
-            });
+        const { title, description, user, name, showNewEmail } = this.state;
+        console.log(title, description, user, name);
+        if (!title || !description || !user || (showNewEmail && !name)) {
+            this.throwMessage("You must write all the labels.");
         } else {
-            const response = await fetch('http://localhost:3500/task', {
-                method: 'POST',
-                body: JSON.stringify({ title, description, user, status: "OPEN" }),
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                    'Accept': 'application/json'
-                }
-            });
-            const json = await response.json();
-            if (json.state) {
-                this.setState({
-                    newMessage: true,
-                    message: "The task has been saved"
-                });
-                this.componentDidMount();
-                this.clearCard();
+            let valEmail = false;
+            if (user === "Not assigned") {
+                valEmail = true;
             } else {
-                this.setState({
-                    newMessage: true,
-                    message: "The task has not been saved"
+                valEmail = this.validateEmail(user);
+            }
+            if (valEmail) {
+                const response = await fetch('http://localhost:3500/task', {
+                    method: 'POST',
+                    body: JSON.stringify({ title, description, user, status: "OPEN" }),
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8',
+                        'Accept': 'application/json'
+                    }
                 });
+                const json = await response.json();
+                if (json.state) {
+                    if (showNewEmail) {
+                        const response_2 = await fetch('http://localhost:3500/user', {
+                            method: 'POST',
+                            body: JSON.stringify({ email: user, name: name }),
+                            headers: {
+                                'Content-Type': 'application/json; charset=UTF-8',
+                                'Accept': 'application/json'
+                            }
+                        });
+                        const json_2 = await response_2.json();
+                        if (json_2.state) {
+                            this.throwMessage("The task and user have been saved");
+                            this.componentDidMount();
+                            this.clearCard();
+                        } else {
+                            this.throwMessage("Error: The task has been saved but the user has not.");
+                        }
+                    } else {
+                        this.throwMessage(json.message);
+                        this.componentDidMount();
+                        this.clearCard();
+                    }
+                } else {
+                    this.throwMessage(json.message);
+                }
+            } else {
+                this.throwMessage("Write a valid email, example@domain.com");
             }
         }
-
     }
 
     clearCard() {
@@ -176,10 +215,12 @@ class Task extends React.Component {
             title: "",
             description: "",
             user: "Not assigned",
+            name: "",
             _id: 0,
             show: false,
             disableUser: true,
-            showRemoveUser: false
+            showRemoveUser: false,
+            showNewEmail: false
         });
     }
 
@@ -228,36 +269,88 @@ class Task extends React.Component {
 
     async upDateCard() {
 
+        const { title, description, user, status, name, showNewEmail } = this.state;
+
         const update = {
-            title: this.state.title,
-            description: this.state.description,
-            user: this.state.user,
-            status: this.state.status
+            title: title,
+            description: description,
+            user: user,
+            status: status
         }
 
-        const response = await fetch('http://localhost:3500/task/' + this.state._id, {
-            method: 'PUT',
-            body: JSON.stringify(update),
-            headers: {
-                'Content-Type': 'application/json; charset=UTF-8',
-                'Accept': 'application/json'
-            }
-        });
+        let valEmail = false;
 
-        const json = await response.json();
-        if (json.state) {
-            this.setState({
-                newMessage: true,
-                message: "The task has been updated",
-                show: false
-            });
-            this.clearCard();
-            this.componentDidMount();
+        if (user === "Not assigned") {
+            valEmail = true;
         } else {
-            this.setState({
-                newMessage: true,
-                message: "The task has not been updated"
-            });
+            valEmail = this.validateEmail(user);
+        }
+
+        if (valEmail) {
+
+            if (showNewEmail) {
+                if (!name) {
+                    this.throwMessage("You have write a user's name.");
+                } else {
+                    const response_2 = await fetch('http://localhost:3500/user', {
+                        method: 'POST',
+                        body: JSON.stringify({ email: user, name: name }),
+                        headers: {
+                            'Content-Type': 'application/json; charset=UTF-8',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const json_2 = await response_2.json();
+                    if (json_2.state) {
+                        const response = await fetch('http://localhost:3500/task/' + this.state._id, {
+                            method: 'PUT',
+                            body: JSON.stringify(update),
+                            headers: {
+                                'Content-Type': 'application/json; charset=UTF-8',
+                                'Accept': 'application/json'
+                            }
+                        });
+                        const json = await response.json();
+                        if (json.state) {
+                            this.setState({
+                                newMessage: true,
+                                message: "Task updated and user add successfuly!",
+                                show: false//hide the update button
+                            });
+                            this.clearCard();
+                            this.componentDidMount();
+                        } else {
+                            this.throwMessage("Error: User add successfuly! But the task could not update!");
+                            this.componentDidMount();
+                        }
+                    } else {
+                        this.throwMessage("Error: The user could not be add and the task could not update!");
+                    }
+                }
+            } else {
+                const response = await fetch('http://localhost:3500/task/' + this.state._id, {
+                    method: 'PUT',
+                    body: JSON.stringify(update),
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8',
+                        'Accept': 'application/json'
+                    }
+                });
+                const json = await response.json();
+                if (json.state) {
+                    this.setState({
+                        newMessage: true,
+                        message: "The task has been updated",
+                        show: false//hide the update button
+                    });
+                    this.clearCard();
+                    this.componentDidMount();
+                } else {
+                    this.throwMessage("The task has not been updated");
+                }
+            }
+        } else {
+            this.throwMessage("Write a valid email, example@domain.com");
         }
     }
 
@@ -303,7 +396,7 @@ class Task extends React.Component {
     }
 
     render() {
-        const { ok, lisTask, newMessage, message, show, disableUser, showRemoveUser, showNewEmail } = this.state;
+        const { ok, lisTask, newMessage, message, show, disableUser, showRemoveUser, showNewEmail, name } = this.state;
         let empty = false;
         if (!ok) {
             return (
@@ -376,26 +469,34 @@ class Task extends React.Component {
 
                                     {/* Task user */}
                                     <li className="list-group-item">
+                                        {showNewEmail ?
+                                            <div>
+                                                <h6>
+                                                    This email don't exist. It will be add
+                                                        </h6>
+                                            </div>
+                                            :
+                                            null
+                                        }
                                         {showRemoveUser ?
                                             <button type="submit" id="btnRemove" className="btn btn-danger btn-EdiTask" onClick={this.removeUser}>
                                                 Remove this user
                                             </button> :
                                             <div className="chekbox">
-                                                {showNewEmail ? 
-                                                    <div>
-                                                        <h6>
-                                                            This email don't exist. It will be add
-                                                        </h6>
-                                                    </div>
-                                                    : 
-                                                    null
-                                                }
                                                 <input className="form-check-input" type="checkbox" id="assignUser" onChange={this.checkbox} />
                                                 <label className="form-check-label" htmlFor="assignUser">Assing a User.</label>
                                             </div>
                                         }
-                                        <input className="form-control" placeholder="@user's mail" name="user" id="inputUser" value={this.state.user} onChange={this.cardChanged2} disabled={disableUser}
+                                        <input className="form-control" list="listUser" placeholder="user@mail.com" name="user" id="inputUser" value={this.state.user} onChange={this.cardChanged2} disabled={disableUser}
                                         />
+                                        <datalist id="listUser">
+                                            <option></option>
+                                        </datalist>
+
+                                        {showNewEmail ?
+                                            <input className="form-control" type="text" name="name" placeholder="User's name" value={name} onChange={this.cardChanged}></input>
+                                            : null
+                                        }
                                     </li>
                                 </ul>
                             </div>

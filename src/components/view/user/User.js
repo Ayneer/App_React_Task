@@ -26,6 +26,7 @@ class User extends React.Component {
         this.editUser = this.editUser.bind(this);
         this.updateUSer = this.updateUSer.bind(this);
         this.deleteUser = this.deleteUser.bind(this);
+        this.filterUser = this.filterUser.bind(this);
     }
 
     async componentDidMount() {
@@ -38,13 +39,26 @@ class User extends React.Component {
         });
         const json = await response.json();
 
-        listUserFilter = [];
+        listUserFilter = json.user;
 
         if (json.state) {
             this.setState({ listUser: json.user, showUser: true });
         } else {
             this.setState({ ok: false });
         }
+    }
+
+    filterUser(event) {
+
+        const value = event.target.value;
+
+        var filter = listUserFilter.filter((str) => {
+            return str.name.toLowerCase().includes(value.toLowerCase()) || str.email.toLowerCase().includes(value.toLowerCase());
+        });
+
+        this.setState({
+            listUser: filter
+        });
     }
 
     formUser(event) {
@@ -94,7 +108,7 @@ class User extends React.Component {
             } else {
                 this.setState({
                     newMessage: true,
-                    message: "write a email valid."
+                    message: "write a valid email."
                 });
             }
 
@@ -195,7 +209,8 @@ class User extends React.Component {
             name: "",
             email: "",
             id: "",
-            btnEditUser: false
+            btnEditUser: false,
+            newMessage: false
         });
     }
 
@@ -221,21 +236,21 @@ class User extends React.Component {
 
                                 <div className="card-header">
 
-                                    <input className="form-control" type="text" name="name" placeholder="User's name" value={name} onChange={this.formUser}></input>
+                                    <input className="form-control inputUser" type="text" name="name" placeholder="User's name" value={name} onChange={this.formUser}></input>
 
-                                    <input className="form-control" type="text" name="email" placeholder="User's email" value={email} onChange={this.formUser} required />
+                                    <input className="form-control inputUser" type="text" name="email" placeholder="User's email" value={email} onChange={this.formUser} required />
 
                                     <div className="btn-group-md">
                                         {btnEditUser ?
-                                            <button type="submit" className="btn btn-primary mr-3 btn-newUser" onClick={this.updateUSer}>
+                                            <button type="submit" className="btn btn-primary mr-3 btn-newUser inputUser" onClick={this.updateUSer}>
                                                 Update user
                                             </button>
                                             :
-                                            <button type="submit" className="btn btn-primary mr-3 btn-newUser" onClick={this.newUser}>
+                                            <button type="submit" className="btn btn-primary mr-3 btn-newUser inputUser" onClick={this.newUser}>
                                                 Create user
                                             </button>
                                         }
-                                        <button type="submit" className="btn btn-danger btn-newUser" onClick={this.clearCard}>
+                                        <button type="submit" className="btn btn-danger btn-newUser inputUser" onClick={this.clearCard}>
                                             Cancel
                                         </button>
                                     </div>
@@ -246,36 +261,44 @@ class User extends React.Component {
 
                         </div>
                         <div className="col-lg-8 listUser">
+
                             {newMessageListUser ? <div>{message}</div> : null}
+
+                            <div className="filterUser">
+                                <input className="form-control" type="text" placeholder="Search a user by name or email" aria-label="Search" onChange={this.filterUser} />
+                            </div>
+
                             {ThereUser ?
-                                <table className="table">
-                                    <thead className="thead-dark">
-                                        <tr>
-                                            <th scope="col">#</th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Email</th>
-                                            <th scope="col">Accions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {listUser.map((user, index) =>
-                                            <tr key={index}>
-                                                <th scope="row">{index + 1}</th>
-                                                <td>{user.name}</td>
-                                                <td>{user.email}</td>
-                                                <td>
-                                                    <div className="btn-group-sm">
-
-                                                        <button className="btn btn-primary mr-3" value={user._id} onClick={this.editUser}>Edit</button>
-
-                                                        <button className="btn btn-danger" value={user._id} onClick={this.deleteUser}>Delete</button>
-                                                    </div>
-                                                </td>
+                                <div className="table-responsive">
+                                    <table className="table">
+                                        <thead className="thead-dark">
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Email</th>
+                                                <th scope="col">Accions</th>
                                             </tr>
-                                        )}
+                                        </thead>
+                                        <tbody>
+                                            {listUser.map((user, index) =>
+                                                <tr key={index}>
+                                                    <th scope="row">{index + 1}</th>
+                                                    <td>{user.name}</td>
+                                                    <td>{user.email}</td>
+                                                    <td>
+                                                        <div className="btn-group-sm">
 
-                                    </tbody>
-                                </table>
+                                                            <button className="btn btn-primary mr-3" value={user._id} onClick={this.editUser}>Edit</button>
+
+                                                            <button className="btn btn-danger" value={user._id} onClick={this.deleteUser}>Delete</button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+
+                                        </tbody>
+                                    </table>
+                                </div>
                                 :
                                 <div>There is not any user...</div>
                             }
